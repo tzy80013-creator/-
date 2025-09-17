@@ -1,4 +1,16 @@
-from pyrogram import Client, filters
+ZThon-Kian/
+├─ main.py
+├─ requirements.txt
+├─ Procfile
+├─ railway.json
+├─ README.md
+├─ start.sh
+└─ zthron/               # مجلد سورس ZThon
+    ├─ __init__.py
+    ├─ commands.py
+    ├─ utils.py
+    └─ ...              # باقي ملفات سورس
+from zthron import bot
 import os
 
 API_ID = int(os.getenv("API_ID"))
@@ -6,51 +18,37 @@ API_HASH = os.getenv("API_HASH")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 SESSION = os.getenv("SESSION")
 
-app = Client(
-    name="KianSource",
-    api_id=API_ID,
-    api_hash=API_HASH,
-    bot_token=BOT_TOKEN,
-    session_string=SESSION
-)
+bot.start(api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN, session_string=SESSION)
+pyrogram==2.0.106
+tgcrypto
+worker: python3 main.py
+{
+  "build": {
+    "builder": "python"
+  },
+  "deploy": {
+    "startCommand": "python3 main.py"
+  }
+}
+# سورس كيان مبني على ZThon
 
-# رسالة الترحيب
-@app.on_message(filters.command("start") & filters.private)
-async def start(_, message):
-    await message.reply_text(
-        "👋 أهلاً بك في **سورس كيان**\n"
-        "✨ المطور: كيان\n"
-        "📡 قناة السورس: @k_ian_1"
-    )
+### خطوات التشغيل
+1. إعداد متغيرات البيئة:
+2. رفع المستودع إلى GitHub.
 
-# أمر كتم
-muted = set()
+3. في Railway:
+   - New Project → Deploy from GitHub
+   - إضافة المتغيرات البيئية
+   - Deploy
 
-@app.on_message(filters.command("كتم", prefixes=".") & filters.group)
-async def mute(_, message):
-    if message.reply_to_message:
-        user_id = message.reply_to_message.from_user.id
-        muted.add(user_id)
-        await message.reply_text(
-            f"🤫 هشش ولا نفس!\n✅ تم كتم {message.reply_to_message.from_user.mention}"
-        )
-
-# أمر الغاء كتم
-@app.on_message(filters.command("الغاءكتم", prefixes=".") & filters.group)
-async def unmute(_, message):
-    if message.reply_to_message:
-        user_id = message.reply_to_message.from_user.id
-        if user_id in muted:
-            muted.remove(user_id)
-            await message.reply_text(
-                f"🔊 تم إلغاء الكتم عن {message.reply_to_message.from_user.mention}"
-            )
-
-# حماية من رسائل المكتومين
-@app.on_message(filters.text & filters.group)
-async def block_muted(_, message):
-    if message.from_user and message.from_user.id in muted:
-        await message.delete()
-
-print("🚀 سورس كيان جاهز للعمل ...")
-app.run()
+### أوامر أساسية
+- `.start` : رسالة الترحيب
+- `.كتم` : كتم مستخدم
+- `.الغاءكتم` : إلغاء كتم
+- بقية الأوامر داخل `zthron/commands.py`
+#!/bin/bash
+export API_ID=xxxx
+export API_HASH=xxxx
+export BOT_TOKEN=xxxx
+export SESSION=xxxx
+python3 main.py
